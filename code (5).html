@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReWrite LLC - Intern NDA</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: auto;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        .instructions {
+            background-color: #e7f3fe;
+            border-left: 6px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #2196F3;
+        }
+        .nda-text-container { /* Added a container for the NDA text for PDF generation */
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        .nda-text {
+            white-space: pre-wrap; /* Preserves formatting of the NDA text */
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.9em;
+            max-height: 450px; /* Reduced slightly to make space for signature in view */
+            overflow-y: auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="email"], input[type="date"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .signature-pad-container {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        #signature-pad {
+            width: 100%;
+            height: 200px;
+            cursor: crosshair;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #007bff; /* Blue */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button.clear {
+            background-color: #f0ad4e; /* Orange for clear */
+        }
+        button.clear:hover {
+            background-color: #eea236;
+        }
+        .signature-placeholder-in-pdf {
+            border: 1px dashed #ccc;
+            height: 60px; /* Adjusted for better visual in PDF */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            margin-top: 5px; /* Space above signature */
+            margin-bottom: 5px; /* Space below signature name */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            text-align: left; /* For the text "Intern's Signature Area" */
+        }
+        .form-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #fdfdfd;
+        }
+         /* Content specifically for PDF rendering */
+        #pdf-render-area {
+            padding: 20px; /* Simulates page margins for PDF */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ReWrite LLC - Intern Non-Disclosure Agreement</h1>
+
+        <div class="instructions">
+            <h3>Instructions for Interns</h3>
+            <ol>
+                <li>Fill in your full name, mailing address, and today's date below.</li>
+                <li>Read the Non-Disclosure Agreement carefully.</li>
+                <li>Sign in the signature box using your mouse or touchscreen.</li>
+                <li>Click the "Generate & Download NDA PDF" button.</li>
+                <li>A PDF file of the signed agreement will be downloaded to your computer.</li>
+                <li><strong>Important:</strong> Please email this downloaded PDF to James Brady at <strong>James@jamesbrady.org</strong>.</li>
+            </ol>
+        </div>
+
+        <div class="form-section">
+            <h2>Your Details</h2>
+            <label for="internName">Intern Full Name:</label>
+            <input type="text" id="internName" name="internName" required>
+
+            <label for="internAddress">Intern Mailing Address:</label>
+            <input type="text" id="internAddress" name="internAddress" required>
+
+            <label for="agreementDate">Agreement Date:</label>
+            <input type="date" id="agreementDate" name="agreementDate" required>
+        </div>
+
+        <!-- This div will be used for PDF generation -->
+        <div id="pdf-render-area">
+            <h2 style="text-align:center;">NON-DISCLOSURE AGREEMENT</h2>
+            <div class="nda-text-container">
+                <div class="nda-text" id="nda-fulltext-for-pdf">
+This Non-Disclosure Agreement ("Agreement") is entered into as of <span class="placeholder-date">[DATE]</span>, by and between ReWrite LLC, a <span class="placeholder-company-state">[COMPANY STATE]</span> limited liability company with its principal place of business at <span class="placeholder-company-address">[COMPANY ADDRESS]</span> ("Company"), and <span class="placeholder-intern-name">[INTERN NAME]</span>, an individual with a mailing address at <span class="placeholder-intern-address">[INTERN ADDRESS]</span> ("Intern").
+
+WHEREAS, Company is consulting for a third-party firm ("Client") on a novel artificial intelligence project ("Project"); WHEREAS, Company has been granted rights by Client to engage interns to assist with the Project; WHEREAS, Intern will be engaged by Company to perform services related to the Project and will have access to Confidential Information (as defined below); WHEREAS, Company desires to protect the Confidential Information and manage liability associated with Intern’s engagement;
+
+NOW, THEREFORE, in consideration of the mutual promises and covenants contained herein, the parties agree as follows:
+
+1. DEFINITION OF CONFIDENTIAL INFORMATION
+"Confidential Information" includes all non-public information, whether oral, written, electronic, or in any other form, disclosed by Company or Client to Intern, or accessed by Intern in connection with the Project, including but not limited to:
+a. Technical data, algorithms, source code, software, machine learning models, training datasets, and other proprietary technologies;
+b. Business plans, strategies, financial information, client lists, and marketing materials;
+c. Trade secrets, know-how, and proprietary methodologies related to the Project;
+d. Any information designated as confidential by Company or Client, or that Intern reasonably should know is confidential.
+Confidential Information does not include information that:
+a. Is or becomes publicly available through no fault of Intern;
+b. Was lawfully in Intern’s possession prior to disclosure by Company;
+c. Is lawfully obtained by Intern from a third party without restriction; or
+d. Is independently developed by Intern without use of or reference to Confidential Information.
+
+2. NON-DISCLOSURE OBLIGATIONS
+Intern agrees to:
+a. Hold all Confidential Information in strict confidence and not disclose it to any third party without prior written consent from Company;
+b. Use Confidential Information solely for the purpose of performing services for the Project as directed by Company;
+c. Not copy, reproduce, or store Confidential Information except as necessary to perform services for the Project, and only with Company’s approval;
+d. Immediately notify Company in writing of any unauthorized use or disclosure of Confidential Information and cooperate in mitigating any resulting harm.
+
+3. OWNERSHIP AND RETURN OF CONFIDENTIAL INFORMATION
+a. All Confidential Information remains the exclusive property of Company or Client, as applicable.
+b. Upon termination of Intern’s engagement or at Company’s request, Intern shall promptly return or destroy all materials containing Confidential Information, including any copies, and certify in writing that such return or destruction has been completed.
+c. Intern shall not retain any Confidential Information in any form, including in personal devices, cloud storage, or other media.
+
+4. PERMITTED USE OF GENERAL SKILLS
+a. Intern may use general skills, knowledge, and experience gained during the Project, including techniques referred to as "vibe coding," in future work, provided such use does not involve the disclosure, use, or incorporation of any Confidential Information.
+b. For clarity, "vibe coding" refers to general programming techniques, problem-solving approaches, and creative coding methodologies taught by Company, but does not include any proprietary algorithms, code, or processes specific to the Project or Client.
+
+5. NON-COMPETE AND NON-SOLICITATION
+a. During the term of Intern’s engagement and for a period of one (1) year thereafter, Intern shall not, directly or indirectly, engage in any business or project that competes with the Project or uses Confidential Information to develop similar AI technologies, without prior written consent from Company.
+b. Intern shall not, during the term of engagement and for one (1) year thereafter, solicit or attempt to solicit any employee, contractor, or client of Company or Client for purposes of competing with the Project.
+
+6. TERM AND TERMINATION
+a. This Agreement shall commence on the date first written above and continue until terminated by either party with thirty (30) days’ written notice.
+b. The obligations of confidentiality and non-use of Confidential Information shall survive termination of this Agreement and continue indefinitely, or until the Confidential Information no longer qualifies as confidential under Section 1.
+
+7. INJUNCTIVE RELIEF
+Intern acknowledges that unauthorized disclosure or use of Confidential Information may cause irreparable harm to Company or Client. Company shall be entitled to seek injunctive relief, in addition to any other remedies available at law or equity, to prevent or mitigate such harm.
+
+8. INDEMNIFICATION
+Intern agrees to indemnify and hold harmless Company, Client, and their respective officers, directors, and agents from any losses, damages, or liabilities arising from Intern’s breach of this Agreement, including unauthorized disclosure or use of Confidential Information.
+
+9. GOVERNING LAW AND DISPUTE RESOLUTION
+a. This Agreement shall be governed by and construed in accordance with the laws of the State of <span class="placeholder-company-state">[COMPANY STATE]</span>, without regard to its conflict of laws principles.
+b. Any disputes arising under this Agreement shall be resolved through binding arbitration in <span class="placeholder-arbitration-city-state">[CITY, STATE OF ARBITRATION]</span>, in accordance with the rules of the American Arbitration Association. The prevailing party shall be entitled to recover reasonable attorneys’ fees and costs.
+
+10. MISCELLANEOUS
+a. This Agreement constitutes the entire understanding between the parties and supersedes all prior agreements or understandings, whether written or oral, relating to the subject matter.
+b. This Agreement may not be amended except in writing signed by both parties.
+c. If any provision of this Agreement is found to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.
+d. Intern acknowledges that they have read and understood this Agreement and have had the opportunity to consult with legal counsel before signing.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
+
+REWRITE LLC
+
+By: _______________________________ (Company Signature)
+Name: <span class="placeholder-company-rep-name">[YOUR COMPANY REPRESENTATIVE NAME]</span>
+Title: <span class="placeholder-company-rep-title">[YOUR COMPANY REPRESENTATIVE TITLE]</span>
+Date: _______________________________ (Date of Company Signature)
+
+<br><br>
+INTERN
+
+By (Signature):
+<div class="signature-placeholder-in-pdf" id="intern-signature-img-placeholder-pdf">Intern's Signature Area</div>
+Name (Printed): <span class="placeholder-intern-name">[INTERN NAME]</span>
+Date: <span class="placeholder-date">[DATE]</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Intern Signature</h2>
+            <p>Please sign in the box below using your mouse or touchscreen:</p>
+            <div class="signature-pad-container">
+                <canvas id="signature-pad"></canvas>
+            </div>
+            <div class="button-container">
+                <button id="clear-signature" class="clear">Clear Signature</button>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button id="generate-pdf-button">Generate & Download NDA PDF</button>
+        </div>
+        <p id="pdf-generation-status" style="text-align:center; margin-top:10px; font-weight:bold;"></p>
+    </div>
+
+    <script>
+        // --- COMPANY CONFIGURATION ---
+        const companyConfig = {
+            state: "Utah",
+            address: "654 W 800 S Alpine Utah 84004",
+            repName: "James Brady",
+            repTitle: "Mad Scientist",
+            arbitrationCityState: "Alpine, Utah" // City and State for dispute resolution
+        };
+        // --- END CONFIGURATION ---
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            const agreementDateInput = document.getElementById('agreementDate');
+            agreementDateInput.value = today;
+
+            const canvas = document.getElementById('signature-pad');
+            const signaturePad = new SignaturePad(canvas, {
+                backgroundColor: 'rgb(255, 255, 255)'
+            });
+
+            function resizeCanvas() {
+                const ratio =  Math.max(window.devicePixelRatio || 1, 1);
+                canvas.width = canvas.offsetWidth * ratio;
+                canvas.height = canvas.offsetHeight * ratio;
+                canvas.getContext("2d").scale(ratio, ratio);
+                signaturePad.clear();
+            }
+            window.addEventListener("resize", resizeCanvas);
+            resizeCanvas();
+
+            document.getElementById('clear-signature').addEventListener('click', function () {
+                signaturePad.clear();
+            });
+
+            const internNameInput = document.getElementById('internName');
+            const internAddressInput = document.getElementById('internAddress');
+            const ndaFullTextElementForPdf = document.getElementById('nda-fulltext-for-pdf'); // Target PDF content
+
+            function updateNdaTextInPdf() {
+                let text = ndaFullTextElementForPdf.innerHTML; // Base HTML content for PDF
+
+                const internName = internNameInput.value || "[INTERN NAME]";
+                const internAddress = internAddressInput.value || "[INTERN ADDRESS]";
+                // Format date as MM/DD/YYYY or similar for display
+                const agreementDateRaw = agreementDateInput.value;
+                let agreementDateFormatted = "[DATE]";
+                if (agreementDateRaw) {
+                    const dateObj = new Date(agreementDateRaw + 'T00:00:00'); // Ensure local timezone interpretation
+                    agreementDateFormatted = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                }
+
+
+                // Replace placeholders in the PDF content string
+                // Using specific classes for robust replacement
+                let newText = text.replace(/<span class="placeholder-date">\[DATE\]<\/span>/g, `<span class="placeholder-date">${agreementDateFormatted}</span>`);
+                newText = newText.replace(/<span class="placeholder-company-state">\[COMPANY STATE\]<\/span>/g, `<span class="placeholder-company-state">${companyConfig.state}</span>`);
+                newText = newText.replace(/<span class="placeholder-company-address">\[COMPANY ADDRESS\]<\/span>/g, `<span class="placeholder-company-address">${companyConfig.address}</span>`);
+                newText = newText.replace(/<span class="placeholder-intern-name">\[INTERN NAME\]<\/span>/g, `<span class="placeholder-intern-name">${internName}</span>`);
+                newText = newText.replace(/<span class="placeholder-intern-address">\[INTERN ADDRESS\]<\/span>/g, `<span class="placeholder-intern-address">${internAddress}</span>`);
+                newText = newText.replace(/<span class="placeholder-company-rep-name">\[YOUR COMPANY REPRESENTATIVE NAME\]<\/span>/g, `<span class="placeholder-company-rep-name">${companyConfig.repName}</span>`);
+                newText = newText.replace(/<span class="placeholder-company-rep-title">\[YOUR COMPANY REPRESENTATIVE TITLE\]<\/span>/g, `<span class="placeholder-company-rep-title">${companyConfig.repTitle}</span>`);
+                newText = newText.replace(/<span class="placeholder-arbitration-city-state">\[CITY, STATE OF ARBITRATION\]<\/span>/g, `<span class="placeholder-arbitration-city-state">${companyConfig.arbitrationCityState}</span>`);
+
+                ndaFullTextElementForPdf.innerHTML = newText; // Update the content that will be rendered to PDF
+            }
+
+            // Initial update and on input change for PDF content
+            updateNdaTextInPdf(); // Initial call
+            internNameInput.addEventListener('input', updateNdaTextInPdf);
+            internAddressInput.addEventListener('input', updateNdaTextInPdf);
+            agreementDateInput.addEventListener('change', updateNdaTextInPdf);
+
+
+            document.getElementById('generate-pdf-button').addEventListener('click', async function () {
+                const internName = internNameInput.value;
+                const internAddress = internAddressInput.value;
+                const agreementDate = agreementDateInput.value;
+                const statusMessage = document.getElementById('pdf-generation-status');
+
+                if (!internName || !internAddress || !agreementDate) {
+                    alert('Please fill in all your details (Name, Address, Date).');
+                    return;
+                }
+                if (signaturePad.isEmpty()) {
+                    alert('Please provide your signature.');
+                    return;
+                }
+
+                statusMessage.textContent = "Generating PDF, please wait...";
+                // Ensure text is up-to-date before generating PDF
+                updateNdaTextInPdf();
+
+                const signatureDataUrl = signaturePad.toDataURL('image/png');
+                const signaturePlaceholderForPdf = document.getElementById('intern-signature-img-placeholder-pdf');
+
+                // Apply signature image to the placeholder within the PDF content area
+                signaturePlaceholderForPdf.style.backgroundImage = `url(${signatureDataUrl})`;
+                signaturePlaceholderForPdf.style.backgroundSize = 'contain';
+                signaturePlaceholderForPdf.style.backgroundRepeat = 'no-repeat';
+                signaturePlaceholderForPdf.style.backgroundPosition = 'left center'; // Align signature to left
+                signaturePlaceholderForPdf.style.height = '60px'; // Consistent height
+                signaturePlaceholderForPdf.textContent = ''; // Clear placeholder text
+
+                const { jsPDF } = window.jspdf;
+                const pdfRenderElement = document.getElementById('pdf-render-area');
+
+                try {
+                    const canvas = await html2canvas(pdfRenderElement, {
+                        scale: 2, // Higher scale for better quality
+                        useCORS: true,
+                        logging: false, // Turn off for less console noise unless debugging
+                        onclone: (clonedDoc) => {
+                            // Ensure the NDA text within the cloned document is fully visible for PDF generation
+                            const ndaTextInClone = clonedDoc.querySelector('#nda-fulltext-for-pdf');
+                            if (ndaTextInClone) {
+                                ndaTextInClone.style.maxHeight = 'none'; // Remove scroll constraint for PDF
+                                ndaTextInClone.style.overflowY = 'visible';
+                            }
+                            // Make sure the signature image placeholder is styled for the clone
+                            const sigPlaceholderInClone = clonedDoc.getElementById('intern-signature-img-placeholder-pdf');
+                             if(sigPlaceholderInClone) {
+                                if (signaturePad.isEmpty()) {
+                                    sigPlaceholderInClone.textContent = "Intern's Signature Area (Not Signed)";
+                                    sigPlaceholderInClone.style.backgroundImage = '';
+                                } else {
+                                    sigPlaceholderInClone.style.backgroundImage = `url(${signatureDataUrl})`;
+                                    sigPlaceholderInClone.style.backgroundSize = 'contain';
+                                    sigPlaceholderInClone.style.backgroundRepeat = 'no-repeat';
+                                    sigPlaceholderInClone.style.backgroundPosition = 'left center';
+                                    sigPlaceholderInClone.style.height = '60px';
+                                    sigPlaceholderInClone.textContent = '';
+                                }
+                            }
+                        }
+                    });
+
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF({
+                        orientation: 'p',
+                        unit: 'pt',
+                        format: 'a4'
+                    });
+
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    const imgProps = pdf.getImageProperties(imgData);
+                    const imgRatio = imgProps.width / imgProps.height;
+                    let imgWidth = pdfWidth - 40; // With some margin
+                    let imgHeight = imgWidth / imgRatio;
+                    
+                    let finalImgHeight = imgHeight;
+                    let finalImgWidth = imgWidth;
+
+                    if (imgHeight > pdfHeight - 40) { // Check if it overflows vertically
+                        finalImgHeight = pdfHeight - 40;
+                        finalImgWidth = finalImgHeight * imgRatio;
+                    }
+                    
+                    const x = (pdfWidth - finalImgWidth) / 2; // Centered horizontally
+                    const y = 20; // Margin from top
+
+                    pdf.addImage(imgData, 'PNG', x, y, finalImgWidth, finalImgHeight);
+                    
+                    const dateForFilename = new Date(agreementDate).toISOString().split('T')[0];
+                    pdf.save(`NDA_ReWriteLLC_${internName.replace(/\s+/g, '_')}_${dateForFilename}.pdf`);
+                    statusMessage.textContent = "PDF downloaded! Please email it as per instructions.";
+
+                } catch (error) {
+                    console.error("Error generating PDF:", error);
+                    alert("An error occurred while generating the PDF. Please check the console for details. You may need to try a different browser or ensure all content is loaded.");
+                    statusMessage.textContent = "Error generating PDF.";
+                } finally {
+                    // Optional: Clear signature from display after PDF generation
+                    // signaturePlaceholderForPdf.style.backgroundImage = '';
+                    // signaturePlaceholderForPdf.textContent = "Intern's Signature Area";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
